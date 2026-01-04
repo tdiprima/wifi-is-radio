@@ -1,6 +1,6 @@
 # WiFi Security Learning Kit 🛜
 
-A small set of Python scripts for understanding what’s observable on **your own WiFi network**.
+A small set of Python scripts for understanding what's observable on **your own WiFi network**.
 
 This is about visibility, not breaking in.
 
@@ -13,7 +13,7 @@ Learning how networks leak info ≠ permission to spy.
 
 * How devices appear and announce themselves on WiFi
 * What metadata is visible even with WPA2/WPA3
-* What encryption does *and doesn’t* hide
+* What encryption does *and doesn't* hide
 * Why HTTPS, VPNs, and segmentation actually matter
 
 No exploits, no gimmicks — just how the air actually behaves.
@@ -50,7 +50,7 @@ Root is required only when capturing packets.
 * WiFi encryption protects **payloads**, not **presence**
 * Devices leak identity and behavior through metadata
 * Anyone on the same network can see more than you think
-* “Hidden” networks and MAC filtering are weak defenses
+* "Hidden" networks and MAC filtering are weak defenses
 * HTTPS and VPNs are not optional on shared networks
 
 ## If You Want to Go Deeper
@@ -69,6 +69,6 @@ This kit is for defense and understanding:
 * Make smarter choices on public WiFi
 * Cut through security hype with reality
 
-Know the system. Don’t be weird with it.
+Know the system. Don't be weird with it.
 
 <br>
