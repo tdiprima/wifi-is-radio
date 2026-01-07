@@ -15,10 +15,10 @@ You'll learn:
 
 When you turn on WiFi, your device does two things:
 
-1. PASSIVE SCANNING: Listens for beacon frames
+1. PASSIVE SCANNING: Listens for beacon frames  
    Routers broadcast their presence every ~100ms
    
-2. ACTIVE SCANNING: Sends probe requests
+2. ACTIVE SCANNING: Sends probe requests  
    Your device asks "Is [network name] here?"
 
 
