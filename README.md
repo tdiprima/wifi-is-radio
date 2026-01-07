@@ -24,18 +24,14 @@ No exploits, no gimmicks — just how the air actually behaves.
 | ---------------------------- | ----------------------------- | ---- |
 | `01_network_info.py`         | Local network details         | No   |
 | `02_arp_discovery.py`        | Discover devices on LAN       | Yes  |
-| `03_packet_types.py`         | Common WiFi / network packets | No   |
 | `04_dns_observer.py`         | Observe DNS traffic           | Yes  |
 | `05_traffic_analyzer.py`     | Traffic patterns & volume     | Yes  |
-| `06_connection_simulator.py` | WiFi connection flow          | No   |
 | `07_security_audit.py`       | Basic network sanity checks   | Yes  |
 
 ## Running
 
 ```bash
 python3 01_network_info.py
-python3 03_packet_types.py
-python3 06_connection_simulator.py
 
 sudo python3 02_arp_discovery.py
 sudo python3 04_dns_observer.py
