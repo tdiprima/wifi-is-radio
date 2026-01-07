@@ -1,0 +1,292 @@
+$ python 06_connection_simulator.py 
+
+╔══════════════════════════════════════════════════════════════════╗
+║  🔐 WIFI CONNECTION SIMULATOR                                    ║
+║     Understanding What Happens When You Connect                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+This educational tool walks you through every step of connecting
+to a WPA2-protected WiFi network.
+
+You'll learn:
+• How your device finds networks
+• What information is exposed during connection
+• How the 4-way handshake proves you know the password
+• What protections you actually have (and don't have)
+
+Press Enter to begin, or Ctrl+C to exit at any time.
+
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  PHASE 1: SCANNING FOR NETWORKS                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+When you turn on WiFi, your device does two things:
+
+1. PASSIVE SCANNING: Listens for beacon frames
+   Routers broadcast their presence every ~100ms
+   
+2. ACTIVE SCANNING: Sends probe requests
+   Your device asks "Is [network name] here?"
+
+
+Press Enter to see this in action...
+
+📡 Your device is listening for beacon frames...
+  ← [BEACON] SSID: HomeNetwork_5G, Security: WPA2, Signal: -45dBm
+  ← [BEACON] SSID: NETGEAR-Guest, Security: Open, Signal: -60dBm
+  ← [BEACON] SSID: Apartment_204, Security: WPA2, Signal: -72dBm
+  ← [BEACON] SSID: CoffeeShop_Free, Security: Open, Signal: -80dBm
+
+💡 INSIGHT: Beacon frames are NEVER encrypted.
+   Anyone nearby can see:
+   • What networks exist
+   • Their security settings  
+   • Approximate router locations (via signal strength)
+
+
+Press Enter to see probe requests...
+
+📱 Your device sends probe requests for saved networks...
+  → [PROBE REQUEST] Looking for: HomeNetwork_5G
+  → [PROBE REQUEST] Looking for: Work-Corporate
+  → [PROBE REQUEST] Looking for: Airport_WiFi
+
+⚠️ PRIVACY CONCERN: Your device just announced where you've been!
+
+   By probing for "Work-Corporate" and "Airport_WiFi", you revealed:
+   • You work at a company using that network name
+   • You recently traveled through that airport
+   
+   Attackers use this for:
+   • Tracking individuals
+   • Setting up "evil twin" networks with names you trust
+   
+   🛡️ DEFENSE: Disable "auto-join" for sensitive networks
+
+
+============================================================
+Press Enter for Phase 2: Authentication...
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  PHASE 2: AUTHENTICATION                                         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+You select "HomeNetwork_5G" and enter the password.
+Now the authentication process begins...
+
+
+Press Enter to start authentication...
+
+Your device MAC: 83:2a:04:10:8f:ef
+Access Point MAC: 99:28:ed:d3:48:fa
+
+Step 1: Open System Authentication
+--------------------------------------------------
+  → [AUTH REQUEST] Algorithm: Open System, Seq: 1
+  ← [AUTH RESPONSE] Algorithm: Open System, Seq: 2, Status: Successful
+
+💡 NOTE: This "authentication" is just a formality in WPA2.
+   The REAL authentication happens in the 4-way handshake.
+   This step exists for backward compatibility.
+
+
+Press Enter for association...
+
+Step 2: Association
+--------------------------------------------------
+  → [ASSOC REQUEST] SSID: HomeNetwork_5G, Capabilities: 802.11n, 802.11ac
+  ← [ASSOC RESPONSE] Status: Successful, Association ID: 17
+
+💡 Association tells the AP:
+   • Which network you want to join
+   • What capabilities your device has
+   • Establishes your "slot" on the network
+   
+   But you still can't send real data yet...
+
+
+============================================================
+Press Enter for Phase 3: 4-Way Handshake...
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  PHASE 3: THE 4-WAY HANDSHAKE (Where the magic happens)         ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+This is where WPA2 security actually happens.
+The goal: Prove you know the password WITHOUT sending it.
+
+
+Press Enter to begin the handshake...
+
+============================================================
+MESSAGE 1 of 4: AP sends ANonce
+============================================================
+  ← [EAPOL Key] ANonce: dc9d585425af3de1...
+
+   The AP generates a random number (ANonce) and sends it.
+   This will be used to derive the encryption keys.
+
+
+Press Enter for Message 2...
+
+============================================================
+MESSAGE 2 of 4: Client sends SNonce + MIC
+============================================================
+
+   Your device now has everything needed to calculate the PTK:
+   
+   PTK = PRF(PMK + ANonce + SNonce + AP_MAC + Client_MAC)
+   
+   Where PMK is derived from the WiFi password.
+
+
+   📝 Calculating PTK...
+   ✓ PTK generated: fe687b0b0481e9a6...
+
+  → [EAPOL Key] SNonce: 0d45fbaab8b3fb77..., MIC: [proof of PTK]
+
+   The MIC (Message Integrity Code) proves you calculated
+   the correct PTK - which means you know the password.
+   
+   🔑 THE PASSWORD IS NEVER TRANSMITTED!
+   Only proof that you could calculate the same result.
+
+
+Press Enter for Message 3...
+
+============================================================
+MESSAGE 3 of 4: AP sends GTK + confirmation
+============================================================
+  ← [EAPOL Key] GTK: [encrypted group key], MIC: [verified]
+
+   The AP verified your MIC - you proved you know the password!
+   
+   Now it sends the Group Temporal Key (GTK), encrypted with
+   the PTK you both derived. The GTK is used for broadcast
+   traffic that goes to all devices.
+
+
+Press Enter for Message 4...
+
+============================================================
+MESSAGE 4 of 4: Client confirms
+============================================================
+  → [EAPOL Key] ACK: Installation confirmed
+
+   ✅ HANDSHAKE COMPLETE!
+   
+   Both sides now have:
+   • PTK - For encrypted unicast (device-to-AP) traffic
+   • GTK - For encrypted broadcast traffic
+   
+   All future communication will be encrypted.
+
+
+============================================================
+Press Enter for Phase 4: Getting an IP...
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  PHASE 4: GETTING AN IP ADDRESS (DHCP)                          ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+You're authenticated and encrypted, but you still need an IP
+address to actually communicate on the network.
+
+
+Press Enter to start DHCP...
+
+DHCP Process:
+--------------------------------------------------
+  → [DHCP DISCOVER] Broadcast: I need an IP address!
+  ← [DHCP OFFER] How about 192.168.1.182? Gateway: 192.168.1.1
+  → [DHCP REQUEST] Yes, I'll take 192.168.1.182 please
+  ← [DHCP ACK] Confirmed. Lease time: 24 hours
+
+   ✅ You now have:
+   • IP Address: 192.168.1.182
+   • Gateway: 192.168.1.1
+   • DNS Server: 192.168.1.1
+   • Lease Time: 24 hours
+   
+   💡 INSIGHT: DHCP traffic is encrypted by WPA2, but...
+      Your hostname is often sent in the DHCP request.
+      Everyone on the network could see "Jane's-MacBook" joined.
+
+
+============================================================
+Press Enter to see the final summary...
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  CONNECTION COMPLETE - WHAT'S HAPPENING NOW                     ║
+╚══════════════════════════════════════════════════════════════════╝
+
+
+You're fully connected! Here's what's protecting your traffic:
+
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │                    PROTECTION LAYERS                        │
+   ├─────────────────────────────────────────────────────────────┤
+   │                                                             │
+   │   Your Data  ────┐                                          │
+   │                  │                                          │
+   │            ┌─────▼─────┐                                    │
+   │            │  HTTPS    │  Protects web content              │
+   │            │  (TLS)    │  from everyone including router    │
+   │            └─────┬─────┘                                    │
+   │                  │                                          │
+   │            ┌─────▼─────┐                                    │
+   │            │   WPA2    │  Protects from people NOT         │
+   │            │ Encryption│  on your network                   │
+   │            └─────┬─────┘                                    │
+   │                  │                                          │
+   │                  ▼                                          │
+   │              [Router] ───► Internet                         │
+   │                                                             │
+   └─────────────────────────────────────────────────────────────┘
+   
+   ⚠️ IMPORTANT: WPA2 only protects the wireless hop!
+   
+   • Your router can still see unencrypted traffic
+   • Other devices on the network can see broadcast traffic  
+   • DNS queries reveal what sites you visit
+   
+   HTTPS provides end-to-end protection that WPA2 cannot.
+
+
+╔══════════════════════════════════════════════════════════════════╗
+║  📚 KEY TAKEAWAYS                                                ║
+╚══════════════════════════════════════════════════════════════════╝
+
+1. PROBE REQUESTS LEAK INFORMATION
+   Your device announces what networks it knows. 
+   Attackers can use this to track you or set up fake networks.
+
+2. THE PASSWORD IS NEVER SENT OVER THE AIR
+   The 4-way handshake uses cryptographic proofs.
+   But capturing the handshake allows offline password cracking.
+
+3. WPA2 ONLY PROTECTS THE WIRELESS HOP
+   Once traffic reaches your router, WPA2 encryption is removed.
+   Use HTTPS and VPNs for end-to-end protection.
+
+4. EVERYONE ON THE NETWORK IS "INSIDE THE FIREWALL"
+   Other devices on the same network can potentially:
+   • See your MAC address and hostname
+   • Monitor broadcast traffic
+   • Attempt ARP spoofing attacks
+   
+5. ENCRYPT EVERYTHING YOU CAN
+   • Use HTTPS
+   • Use encrypted DNS (DoH/DoT)
+   • Consider a VPN on untrusted networks
