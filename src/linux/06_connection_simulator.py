@@ -384,7 +384,7 @@ Press Enter to begin, or Ctrl+C to exit at any time.
    • Attempt ARP spoofing attacks
    
 5. ENCRYPT EVERYTHING YOU CAN
-   • Use HTTPS everywhere
+   • Use HTTPS
    • Use encrypted DNS (DoH/DoT)
    • Consider a VPN on untrusted networks
 """)

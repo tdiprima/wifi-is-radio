@@ -172,8 +172,9 @@ Even with encryption, observers can learn:
 🔍 **Reveals:** **EVERYTHING** - URLs, content, cookies, passwords  
 😱 **Attack:** Read and modify any traffic  
 
-✅ **Defense:** **ALWAYS** use HTTPS. Use browser extensions like  
-HTTPS Everywhere. Never enter passwords on HTTP sites.
+✅ **Defense:** **ALWAYS** use HTTPS.  
+Use browser extensions like ~~HTTPS Everywhere~~ (officially retired in January 2023).  
+Never enter passwords on HTTP sites.
 
 ### HTTPS/TLS - Encrypted Web Traffic
 **Purpose:** Secure web traffic  
@@ -290,7 +291,7 @@ Even with WPA2/WPA3 encryption:
 
   1. Use WPA3 where possible (has Protected Management Frames)  
   2. Enable encrypted DNS (DoH or DoT)  
-  3. Use HTTPS everywhere  
+  3. ~~Use HTTPS everywhere~~
   4. Consider a VPN on untrusted networks  
   5. Randomize MAC addresses on mobile devices  
   6. Don't save sensitive network names (they're broadcast!)
