@@ -317,7 +317,7 @@ def generate_report(all_findings):
 4. ENDPOINT SECURITY
    • Enable local firewalls on all devices
    • Keep operating systems and software updated
-   • Use HTTPS everywhere
+   • Use HTTPS
    • Consider a VPN for sensitive activities
 
 5. MONITORING

@@ -156,7 +156,7 @@ What you can do:
 • Use a VPN to encrypt all traffic (even from your router)
 • Use encrypted DNS (1.1.1.1 or 8.8.8.8 with DoH)
 • Randomize your MAC address on public networks
-• Use HTTPS everywhere (browser extensions help)
+• Use HTTPS
 """
     )
 
