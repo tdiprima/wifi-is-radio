@@ -125,8 +125,8 @@ Even with encryption, observers can learn:
 **Example:**
 
 ```
-"Who has <IP_ADDRESS>? Tell <IP_ADDRESS>"
-"<IP_ADDRESS> is at aa:bb:cc:dd:ee:ff"
+"Who has 192.168.1.10? Tell 192.168.1.11"
+"192.168.1.10 is at aa:bb:cc:dd:ee:ff"
 ```
 
 🔍 **Reveals:** All active IPs on the network  
@@ -140,7 +140,7 @@ Even with encryption, observers can learn:
 
 ```
 "What's the IP for <URL>?"
-"<URL> is at <IP_ADDRESS>"
+"<URL> is at 192.168.1.12"
 ```
 
 🔍 **Reveals:** **EVERY WEBSITE** you visit (by name)  

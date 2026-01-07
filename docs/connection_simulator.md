@@ -156,20 +156,20 @@ address to actually communicate on the network.
 ### DHCP Process:
 
   <span style="color:#0ff;">→ [DHCP DISCOVER]</span> Broadcast: I need an IP address!  
-  <span style="color:#0f0;">← [DHCP OFFER]</span> How about <IP_ADDRESS>? Gateway: <IP_ADDRESS>  
-  <span style="color:#0ff;">→ [DHCP REQUEST]</span> Yes, I'll take <IP_ADDRESS> please  
+  <span style="color:#0f0;">← [DHCP OFFER]</span> How about 192.168.1.10? Gateway: 192.168.1.11  
+  <span style="color:#0ff;">→ [DHCP REQUEST]</span> Yes, I'll take 192.168.1.10 please  
   <span style="color:#0ff;">← [DHCP ACK]</span> Confirmed. Lease time: 24 hours
 
    ✅ You now have:
    
-   - IP Address: <IP_ADDRESS>  
-   - Gateway: <IP_ADDRESS>  
-   - DNS Server: <IP_ADDRESS>  
+   - IP Address: 192.168.1.10  
+   - Gateway: 192.168.1.11  
+   - DNS Server: 192.168.1.12  
    - Lease Time: 24 hours
    
    💡 INSIGHT: DHCP traffic is encrypted by WPA2, but...  
       Your hostname is often sent in the DHCP request.  
-      Everyone on the network could see "John's-MacBook" joined.
+      Everyone on the network could see "Bear's-MacBook" joined.
 
 
 ## CONNECTION COMPLETE - WHAT'S HAPPENING NOW
@@ -210,25 +210,25 @@ You're fully connected! Here's what's protecting your traffic:
 
 ## 📚 KEY TAKEAWAYS
 
-1. PROBE REQUESTS LEAK INFORMATION  
+1. **Probe requests leak information**  
    Your device announces what networks it knows.  
    Attackers can use this to track you or set up fake networks.
 
-2. THE PASSWORD IS NEVER SENT OVER THE AIR  
+2. **The password is never sent over the air**  
    The 4-way handshake uses cryptographic proofs.  
    But capturing the handshake allows offline password cracking.
 
-3. WPA2 ONLY PROTECTS THE WIRELESS HOP  
+3. **WPA2 only protects the wireless hop**  
    Once traffic reaches your router, WPA2 encryption is removed.  
    Use HTTPS and VPNs for end-to-end protection.
 
-4. EVERYONE ON THE NETWORK IS "INSIDE THE FIREWALL"  
+4. **Everyone on the network is "inside the firewall"**  
    Other devices on the same network can potentially:  
    - See your MAC address and hostname  
    - Monitor broadcast traffic  
    - Attempt ARP spoofing attacks  
    
-5. ENCRYPT EVERYTHING YOU CAN  
+5. **Encrypt everything you can**  
    - Use HTTPS everywhere  
    - Use encrypted DNS (DoH/DoT)  
    - Consider a VPN on untrusted networks

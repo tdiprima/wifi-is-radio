@@ -13,8 +13,8 @@ to help you understand what to look for in network security.
 
 
 📍 Network Information:
-   Your IP: <IP_ADDRESS>
-   Gateway: <IP_ADDRESS>
+   Your IP: 192.168.1.10
+   Gateway: 192.168.1.11
 
 📡 Checking router ports...
    ✗ Port 21 (FTP): Closed
@@ -29,18 +29,18 @@ to help you understand what to look for in network security.
 
 🔍 Checking DNS configuration...
    DNS Server: 2001:0db8:85a3:0000:0000:8a2e:0370:7334
-   DNS Server: <IP_ADDRESS>
+   DNS Server: 192.168.1.12
 
 📋 Checking ARP table...
-   <IP_ADDRESS>      → xx:xx:xx:xx:xx:xx
-   <IP_ADDRESS>    → xx:xx:xx:xx:xx:xy
-   <IP_ADDRESS>    → xx:xx:xx:xx:xx:xz
-   <IP_ADDRESS>      → xx:xx:xx:xx:xx:xa
+   192.168.1.10      → xx:xx:xx:xx:xx:xx
+   192.168.1.11    → xx:xx:xx:xx:xx:xy
+   192.168.1.12    → xx:xx:xx:xx:xx:xz
+   192.168.1.13      → xx:xx:xx:xx:xx:xa
 
-   Gateway <IP_ADDRESS> has MAC: xx:xx:xx:xx:xx:xx
+   Gateway 192.168.1.11 has MAC: xx:xx:xx:xx:xx:xx
 
 🔌 Checking for common insecure services...
-   Found HTTP on <IP_ADDRESS>:80
+   Found HTTP on 192.168.1.10:80
 
 🖥️ Checking local security settings...
    Firewall: DISABLED
