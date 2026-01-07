@@ -33,11 +33,11 @@ to help you understand what to look for in network security.
 
 📋 Checking ARP table...
    192.168.1.10      → xx:xx:xx:xx:xx:xx
-   192.168.1.11    → xx:xx:xx:xx:xx:xy
-   192.168.1.12    → xx:xx:xx:xx:xx:xz
+   192.168.1.11      → xx:xx:xx:xx:xx:xy
+   192.168.1.12      → xx:xx:xx:xx:xx:xz
    192.168.1.13      → xx:xx:xx:xx:xx:xa
 
-   Gateway 192.168.1.11 has MAC: xx:xx:xx:xx:xx:xx
+   Gateway 192.168.1.11 has MAC: xx:xx:xx:xx:xx:xy
 
 🔌 Checking for common insecure services...
    Found HTTP on 192.168.1.10:80
