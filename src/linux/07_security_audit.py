@@ -14,11 +14,14 @@ Run with: sudo python3 07_security_audit.py
 ONLY USE ON YOUR OWN NETWORK.
 """
 
-import sys
 import os
-import subprocess
 import socket
+import subprocess
+import sys
+from contextlib import suppress
 from datetime import datetime
+from pathlib import Path
+
 
 def check_root():
     """Check if running as root."""
@@ -29,8 +32,7 @@ def check_root():
 
 def print_finding(severity, title, description, recommendation):
     """Print a security finding."""
-    icons = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢', 'INFO': 'ℹ️'}
-    icon = icons.get(severity, '•')
+    icon = {'HIGH': '🔴', 'MEDIUM': '🟡', 'LOW': '🟢', 'INFO': 'ℹ️'}.get(severity, '•')
     
     print(f"\n{icon} [{severity}] {title}")
     print(f"   {description}")
@@ -39,25 +41,22 @@ def print_finding(severity, title, description, recommendation):
 
 def get_gateway():
     """Get the default gateway IP."""
-    try:
+    with suppress(BaseException):
         result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
         for line in result.stdout.split('\n'):
             if 'default' in line:
                 return line.split()[2]
-    except:
-        pass
     return None
 
 def get_local_ip():
     """Get local IP address."""
-    try:
+    with suppress(BaseException):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         s.connect(("8.8.8.8", 80))
         ip = s.getsockname()[0]
         s.close()
         return ip
-    except:
-        return None
+    return None
 
 def check_router_ports(gateway):
     """Check for open ports on the router."""
@@ -79,7 +78,7 @@ def check_router_ports(gateway):
     
     open_ports = []
     for port, (name, desc) in dangerous_ports.items():
-        try:
+        with suppress(BaseException):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(1)
             result = sock.connect_ex((gateway, port))
@@ -90,8 +89,6 @@ def check_router_ports(gateway):
                 print(f"   ✓ Port {port} ({name}): OPEN")
             else:
                 print(f"   ✗ Port {port} ({name}): Closed")
-        except:
-            pass
     
     # Generate findings
     for port, name, desc in open_ports:
@@ -107,7 +104,7 @@ def check_router_ports(gateway):
             findings.append(('LOW', 'HTTP (port 80) open on router',
                            'Web admin interface may accept unencrypted logins',
                            'Ensure admin panel redirects to HTTPS'))
-        elif port in [445, 3389]:
+        elif port in (445, 3389):
             findings.append(('MEDIUM', f'{name} (port {port}) open on router',
                            desc,
                            'Disable if not needed, or restrict access'))
@@ -120,14 +117,14 @@ def check_dns_configuration():
     
     print("\n🔍 Checking DNS configuration...")
     
-    try:
-        with open('/etc/resolv.conf', 'r') as f:
-            content = f.read()
+    with suppress(BaseException):
+        content = Path('/etc/resolv.conf').read_text()
         
-        dns_servers = []
-        for line in content.split('\n'):
-            if line.startswith('nameserver'):
-                dns_servers.append(line.split()[1])
+        dns_servers = [
+            line.split()[1]
+            for line in content.split('\n')
+            if line.startswith('nameserver')
+        ]
         
         for dns in dns_servers:
             print(f"   DNS Server: {dns}")
@@ -138,8 +135,6 @@ def check_dns_configuration():
                 findings.append(('INFO', 'Using router as DNS server',
                                'Your router handles DNS - it can log all domains you visit',
                                'Consider using encrypted DNS (1.1.1.1 DoH or 8.8.8.8 DoH)'))
-    except:
-        pass
     
     return findings
 
@@ -200,28 +195,24 @@ def check_open_services():
     
     # Check for common insecure services (quick scan of common IPs)
     insecure_services = []
-    test_ips = [f"{network_prefix}.{i}" for i in [1, 2, 100, 101, 102, 254]]
+    test_ips = [f"{network_prefix}.{i}" for i in (1, 2, 100, 101, 102, 254)]
     
     for ip in test_ips:
         # Quick check for Telnet
-        try:
+        with suppress(BaseException):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.5)
             if sock.connect_ex((ip, 23)) == 0:
                 insecure_services.append((ip, 23, 'Telnet'))
             sock.close()
-        except:
-            pass
         
         # Quick check for unencrypted HTTP
-        try:
+        with suppress(BaseException):
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             sock.settimeout(0.5)
             if sock.connect_ex((ip, 80)) == 0:
                 insecure_services.append((ip, 80, 'HTTP'))
             sock.close()
-        except:
-            pass
     
     for ip, port, service in insecure_services:
         print(f"   Found {service} on {ip}:{port}")
@@ -240,7 +231,8 @@ def check_local_security():
     print("\n🖥️ Checking local security settings...")
     
     # Check if firewall is enabled
-    try:
+    result = None
+    with suppress(BaseException):
         result = subprocess.run(['ufw', 'status'], capture_output=True, text=True)
         if 'inactive' in result.stdout.lower():
             findings.append(('MEDIUM', 'Local firewall (ufw) is disabled',
@@ -249,16 +241,14 @@ def check_local_security():
             print("   Firewall: DISABLED")
         else:
             print("   Firewall: Enabled")
-    except:
+    if result is None:
         print("   Firewall: Unable to check (ufw not installed)")
     
     # Check listening services
-    try:
+    with suppress(BaseException):
         result = subprocess.run(['ss', '-tuln'], capture_output=True, text=True)
         listening = result.stdout.count('LISTEN')
         print(f"   Listening services: {listening}")
-    except:
-        pass
     
     return findings
 

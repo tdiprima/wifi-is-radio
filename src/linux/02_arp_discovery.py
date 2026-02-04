@@ -12,8 +12,10 @@ information is visible to everyone on the same network.
 Run with: sudo python3 02_arp_discovery.py
 """
 
-import sys
 import subprocess
+import sys
+from contextlib import suppress
+
 
 def check_root():
     """Check if running as root."""
@@ -25,27 +27,23 @@ def check_root():
 
 def get_local_network():
     """Determine the local network range to scan."""
-    try:
+    with suppress(Exception):
         result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
         for line in result.stdout.split('\n'):
             if 'src' in line and 'default' not in line:
                 parts = line.split()
                 return parts[0]  # Returns something like 192.168.1.0/24
-    except Exception:
-        pass
     return None
 
 def get_interface():
     """Get the primary network interface."""
-    try:
+    with suppress(Exception):
         result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
         for line in result.stdout.split('\n'):
             if 'default' in line:
                 parts = line.split()
                 dev_idx = parts.index('dev') + 1
                 return parts[dev_idx]
-    except Exception:
-        pass
     return None
 
 def lookup_vendor(mac: str) -> str:
@@ -123,7 +121,7 @@ def arp_scan(network: str, interface: str):
     print("-" * 60)
     
     try:
-        from scapy.all import ARP, Ether, srp, conf
+        from scapy.all import ARP, Ether, conf, srp
         conf.verb = 0  # Suppress scapy output
         
         # Create ARP request packet
@@ -139,13 +137,14 @@ def arp_scan(network: str, interface: str):
         # Send packets and collect responses
         answered, unanswered = srp(packet, iface=interface, timeout=3, verbose=False)
         
-        devices = []
-        for sent, received in answered:
-            devices.append({
+        devices = [
+            {
                 'ip': received.psrc,
                 'mac': received.hwsrc,
                 'vendor': lookup_vendor(received.hwsrc)
-            })
+            }
+            for sent, received in answered
+        ]
         
         return devices
         

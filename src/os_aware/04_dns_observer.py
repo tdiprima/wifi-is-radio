@@ -17,6 +17,7 @@ ONLY USE ON YOUR OWN NETWORK.
 import os
 import sys
 from collections import defaultdict
+from contextlib import suppress
 from datetime import datetime
 
 from network_os_utils import get_interface
@@ -62,7 +63,7 @@ def analyze_dns_packet(packet):
     # Extract query names
     if dns.qdcount > 0 and dns.qd:
         for i in range(dns.qdcount):
-            try:
+            with suppress(BaseException):
                 qname = (
                     dns.qd[i].qname.decode()
                     if isinstance(dns.qd[i].qname, bytes)
@@ -83,21 +84,17 @@ def analyze_dns_packet(packet):
                         "type": type_names.get(qtype, str(qtype)),
                     }
                 )
-            except:
-                pass
 
     # Extract answers (if response)
     if dns.ancount > 0 and dns.an:
         for i in range(dns.ancount):
-            try:
+            with suppress(BaseException):
                 answer = dns.an[i]
                 if hasattr(answer, "rdata"):
                     rdata = answer.rdata
                     if isinstance(rdata, bytes):
                         rdata = rdata.decode()
                     result["answers"].append(str(rdata))
-            except:
-                pass
 
     return result
 

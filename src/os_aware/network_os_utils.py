@@ -9,6 +9,7 @@ instead of implementing platform-specific code.
 
 import platform
 import subprocess
+from contextlib import suppress
 from typing import Optional
 
 
@@ -22,9 +23,8 @@ def get_local_network() -> Optional[str]:
     Determine the local network range to scan.
     Returns something like "192.168.1.0/24"
     """
-    try:
-        system = get_platform()
-
+    system = get_platform()
+    with suppress(Exception):
         if system == "Linux":
             result = subprocess.run(["ip", "route"], capture_output=True, text=True)
             for line in result.stdout.split("\n"):
@@ -37,7 +37,7 @@ def get_local_network() -> Optional[str]:
             result = subprocess.run(["ifconfig"], capture_output=True, text=True)
             lines = result.stdout.split("\n")
 
-            for i, line in enumerate(lines):
+            for line in lines:
                 if "inet " in line and "127.0.0.1" not in line:
                     parts = line.split()
                     if len(parts) >= 4:
@@ -47,7 +47,7 @@ def get_local_network() -> Optional[str]:
                         # Convert netmask to CIDR
                         if netmask.startswith("0x"):
                             netmask_int = int(netmask, 16)
-                            cidr = bin(netmask_int).count('1')
+                            cidr = netmask_int.bit_count()
 
                             # Calculate network address
                             ip_parts = ip.split('.')
@@ -64,8 +64,6 @@ def get_local_network() -> Optional[str]:
 
                             network = '.'.join(network_parts) + f"/{cidr}"
                             return network
-    except Exception:
-        pass
     return None
 
 
@@ -74,9 +72,8 @@ def get_interface() -> Optional[str]:
     Get the primary network interface.
     Returns something like "eth0" on Linux or "en0" on macOS.
     """
-    try:
-        system = get_platform()
-
+    system = get_platform()
+    with suppress(Exception):
         if system == "Linux":
             result = subprocess.run(["ip", "route"], capture_output=True, text=True)
             for line in result.stdout.split("\n"):
@@ -95,8 +92,6 @@ def get_interface() -> Optional[str]:
                         # Skip loopback and utun interfaces
                         if not interface.startswith(("lo", "utun")):
                             return interface
-    except Exception:
-        pass
     return "eth0" if system == "Linux" else "en0"
 
 
@@ -105,9 +100,8 @@ def get_default_gateway() -> Optional[str]:
     Get the default gateway (router's IP).
     Returns something like "192.168.1.1"
     """
-    try:
-        system = get_platform()
-
+    system = get_platform()
+    with suppress(Exception):
         if system == "Linux":
             result = subprocess.run(["ip", "route"], capture_output=True, text=True)
             for line in result.stdout.split("\n"):
@@ -127,8 +121,6 @@ def get_default_gateway() -> Optional[str]:
                         # Make sure it's an IP address, not an interface name
                         if gateway and gateway[0].isdigit():
                             return gateway
-    except Exception:
-        pass
     return None
 
 
@@ -138,9 +130,8 @@ def get_network_interfaces() -> dict:
     Returns dict of {interface_name: {mac, ip, state}}
     """
     interfaces = {}
+    system = get_platform()
     try:
-        system = get_platform()
-
         if system == "Linux":
             import re
             result = subprocess.run(["ip", "addr"], capture_output=True, text=True)
@@ -207,10 +198,9 @@ def get_network_interfaces() -> dict:
                             if netmask.startswith("0x"):
                                 # Convert hex netmask to CIDR
                                 netmask_int = int(netmask, 16)
-                                cidr = bin(netmask_int).count('1')
+                                cidr = netmask_int.bit_count()
                                 ip = f"{ip}/{cidr}"
                         interfaces[current_iface]["ip"] = ip
-
     except Exception as e:
         print(f"Error getting interfaces: {e}")
 
@@ -219,15 +209,14 @@ def get_network_interfaces() -> dict:
 
 def check_command_exists(command: str) -> bool:
     """Check if a command exists on the system."""
-    try:
+    with suppress(Exception):
         result = subprocess.run(
             ["which", command],
             capture_output=True,
-            text=True
+            text=True,
         )
         return result.returncode == 0
-    except Exception:
-        return False
+    return False
 
 
 # Platform-specific command mappings

@@ -181,7 +181,7 @@ class TrafficAnalyzer:
 
     def format_bytes(self, bytes_val: float) -> str:
         """Format bytes into human-readable string."""
-        for unit in ["B", "KB", "MB", "GB"]:
+        for unit in ("B", "KB", "MB", "GB"):
             if bytes_val < 1024:
                 return f"{bytes_val:.1f} {unit}"
             bytes_val /= 1024
@@ -245,10 +245,11 @@ class TrafficAnalyzer:
             )
 
         # Suspicious port check
-        suspicious_ports = []
-        for port in [23, 21, 445, 3389]:  # Telnet, FTP, SMB, RDP
-            if self.port_stats.get(port, 0) > 0:
-                suspicious_ports.append((port, self.get_port_name(port)))
+        suspicious_ports = [
+            (port, self.get_port_name(port))
+            for port in (23, 21, 445, 3389)  # Telnet, FTP, SMB, RDP
+            if self.port_stats.get(port, 0) > 0
+        ]
 
         if suspicious_ports:
             print("   ⚠️ POTENTIALLY INSECURE SERVICES DETECTED:")

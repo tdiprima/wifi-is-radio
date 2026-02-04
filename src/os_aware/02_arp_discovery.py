@@ -15,6 +15,7 @@ Run with: sudo python3 02_arp_discovery.py
 import platform
 import subprocess
 import sys
+from contextlib import suppress
 
 
 def check_root():
@@ -29,7 +30,7 @@ def check_root():
 
 def get_local_network():
     """Determine the local network range to scan."""
-    try:
+    with suppress(Exception):
         system = platform.system()
 
         if system == "Linux":
@@ -54,7 +55,7 @@ def get_local_network():
                         # Convert netmask to CIDR
                         if netmask.startswith("0x"):
                             netmask_int = int(netmask, 16)
-                            cidr = bin(netmask_int).count('1')
+                            cidr = netmask_int.bit_count()
 
                             # Calculate network address
                             ip_parts = ip.split('.')
@@ -71,14 +72,12 @@ def get_local_network():
 
                             network = '.'.join(network_parts) + f"/{cidr}"
                             return network
-    except Exception:
-        pass
     return None
 
 
 def get_interface():
     """Get the primary network interface."""
-    try:
+    with suppress(Exception):
         system = platform.system()
 
         if system == "Linux":
@@ -100,8 +99,6 @@ def get_interface():
                         # Skip loopback and utun interfaces
                         if not interface.startswith(("lo", "utun")):
                             return interface
-    except Exception:
-        pass
     return None
 
 
@@ -198,15 +195,14 @@ def arp_scan(network: str, interface: str):
         # Send packets and collect responses
         answered, unanswered = srp(packet, iface=interface, timeout=3, verbose=False)
 
-        devices = []
-        for sent, received in answered:
-            devices.append(
-                {
-                    "ip": received.psrc,
-                    "mac": received.hwsrc,
-                    "vendor": lookup_vendor(received.hwsrc),
-                }
-            )
+        devices = [
+            {
+                "ip": received.psrc,
+                "mac": received.hwsrc,
+                "vendor": lookup_vendor(received.hwsrc),
+            }
+            for sent, received in answered
+        ]
 
         return devices
 

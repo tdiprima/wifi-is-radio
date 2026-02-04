@@ -10,6 +10,7 @@ Understand what information is available just by being connected to a network.
 """
 
 import socket
+from contextlib import suppress
 from typing import Optional
 
 from network_os_utils import get_default_gateway, get_network_interfaces
@@ -32,7 +33,7 @@ def get_local_ip() -> Optional[str]:
     - Everyone on your network can see traffic to/from this IP
     - It changes if you reconnect (usually)
     """
-    try:
+    with suppress(Exception):
         # This trick creates a socket but doesn't send anything
         # It just figures out which interface would be used
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -40,8 +41,7 @@ def get_local_ip() -> Optional[str]:
         ip = s.getsockname()[0]
         s.close()
         return ip
-    except Exception:
-        return None
+    return None
 
 
 # get_default_gateway is imported from network_os_utils
@@ -58,13 +58,11 @@ def get_dns_servers() -> list:
     - Using encrypted DNS (DoH/DoT) hides this from the network
     """
     dns_servers = []
-    try:
+    with suppress(Exception):
         with open("/etc/resolv.conf", "r") as f:
             for line in f:
                 if line.startswith("nameserver"):
                     dns_servers.append(line.split()[1])
-    except Exception:
-        pass
     return dns_servers
 
 

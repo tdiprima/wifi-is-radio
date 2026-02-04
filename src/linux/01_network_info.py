@@ -9,10 +9,12 @@ LEARNING OBJECTIVE:
 Understand what information is available just by being connected to a network.
 """
 
+import re
 import socket
 import subprocess
-import re
+from contextlib import suppress
 from typing import Optional
+
 
 def get_hostname() -> str:
     """Get this machine's hostname - how it identifies itself on the network."""
@@ -30,7 +32,7 @@ def get_local_ip() -> Optional[str]:
     - Everyone on your network can see traffic to/from this IP
     - It changes if you reconnect (usually)
     """
-    try:
+    with suppress(Exception):
         # This trick creates a socket but doesn't send anything
         # It just figures out which interface would be used
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,8 +40,7 @@ def get_local_ip() -> Optional[str]:
         ip = s.getsockname()[0]
         s.close()
         return ip
-    except Exception:
-        return None
+    return None
 
 def get_default_gateway() -> Optional[str]:
     """
@@ -50,15 +51,13 @@ def get_default_gateway() -> Optional[str]:
     - The gateway can see ALL your unencrypted traffic
     - Whoever controls the gateway controls your network access
     """
-    try:
+    with suppress(Exception):
         result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
         for line in result.stdout.split('\n'):
             if 'default' in line:
                 parts = line.split()
                 gateway_idx = parts.index('via') + 1
                 return parts[gateway_idx]
-    except Exception:
-        pass
     return None
 
 def get_dns_servers() -> list:
@@ -72,13 +71,11 @@ def get_dns_servers() -> list:
     - Using encrypted DNS (DoH/DoT) hides this from the network
     """
     dns_servers = []
-    try:
+    with suppress(Exception):
         with open('/etc/resolv.conf', 'r') as f:
             for line in f:
                 if line.startswith('nameserver'):
                     dns_servers.append(line.split()[1])
-    except Exception:
-        pass
     return dns_servers
 
 def get_network_interfaces() -> dict:

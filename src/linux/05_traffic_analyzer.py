@@ -14,10 +14,13 @@ Run with: sudo python3 05_traffic_analyzer.py
 ONLY USE ON YOUR OWN NETWORK.
 """
 
-import sys
 import os
-from collections import defaultdict
+import sys
 import time
+from collections import defaultdict
+from contextlib import suppress
+from icecream import ic
+
 
 def check_root():
     """Check if running as root."""
@@ -29,15 +32,13 @@ def check_root():
 def get_interface():
     """Get the primary network interface."""
     import subprocess
-    try:
+    with suppress(Exception):
         result = subprocess.run(['ip', 'route'], capture_output=True, text=True)
         for line in result.stdout.split('\n'):
             if 'default' in line:
                 parts = line.split()
                 dev_idx = parts.index('dev') + 1
                 return parts[dev_idx]
-    except Exception:
-        pass
     return 'eth0'
 
 class TrafficAnalyzer:
@@ -69,7 +70,7 @@ class TrafficAnalyzer:
     
     def analyze_packet(self, packet):
         """Analyze a single packet."""
-        from scapy.all import IP, TCP, UDP, ICMP
+        from scapy.all import ICMP, IP, TCP, UDP
         
         self.packet_count += 1
         
@@ -150,6 +151,7 @@ class TrafficAnalyzer:
         )[:8]
         for ip, stats in sorted_ips:
             total = stats['sent'] + stats['received']
+            ic(total)
             print(f"  {ip:<16} TX: {self.format_bytes(stats['sent']):>10}  "
                   f"RX: {self.format_bytes(stats['received']):>10}  "
                   f"Pkts: {stats['packets']:>6}")
@@ -159,7 +161,7 @@ class TrafficAnalyzer:
     
     def format_bytes(self, bytes_val: float) -> str:
         """Format bytes into human-readable string."""
-        for unit in ['B', 'KB', 'MB', 'GB']:
+        for unit in ('B', 'KB', 'MB', 'GB'):
             if bytes_val < 1024:
                 return f"{bytes_val:.1f} {unit}"
             bytes_val /= 1024
@@ -172,7 +174,8 @@ class TrafficAnalyzer:
         print("=" * 70)
         
         elapsed = time.time() - self.start_time
-        
+        ic(elapsed)
+
         # Packet size analysis
         if self.packet_sizes:
             avg_size = sum(self.packet_sizes) / len(self.packet_sizes)
@@ -214,10 +217,11 @@ class TrafficAnalyzer:
 """)
         
         # Suspicious port check
-        suspicious_ports = []
-        for port in [23, 21, 445, 3389]:  # Telnet, FTP, SMB, RDP
-            if self.port_stats.get(port, 0) > 0:
-                suspicious_ports.append((port, self.get_port_name(port)))
+        suspicious_ports = [
+            (port, self.get_port_name(port))
+            for port in (23, 21, 445, 3389)  # Telnet, FTP, SMB, RDP
+            if self.port_stats.get(port, 0) > 0
+        ]
         
         if suspicious_ports:
             print("   ⚠️ POTENTIALLY INSECURE SERVICES DETECTED:")
@@ -277,7 +281,7 @@ Press Ctrl+C to stop and see detailed analysis.
     last_update = time.time()
     
     try:
-        from scapy.all import sniff, conf
+        from scapy.all import conf, sniff
         conf.verb = 0
         
         def packet_callback(packet):
