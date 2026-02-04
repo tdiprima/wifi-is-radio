@@ -232,8 +232,6 @@ def check_command_exists(command: str) -> bool:
 
 # Platform-specific command mappings
 def get_arp_command() -> list:
-    """Get the appropriate ARP command for the platform."""
-    system = get_platform()
     # Both Linux and macOS use 'arp -a'
     return ["arp", "-a"]
 

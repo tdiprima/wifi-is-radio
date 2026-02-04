@@ -50,7 +50,7 @@ def analyze_dns_packet(packet):
     - Questions (what's being asked)
     - Answers (IP addresses, etc.)
     """
-    from scapy.all import DNS, DNSQR, DNSRR, IP
+    from scapy.all import DNS, IP
     
     if not packet.haslayer(DNS):
         return None
@@ -178,7 +178,7 @@ Press Ctrl+C to stop monitoring.
     domains_seen = set()
     
     try:
-        from scapy.all import sniff, DNS, conf
+        from scapy.all import sniff, conf
         conf.verb = 0
         
         def packet_callback(packet):

@@ -16,7 +16,6 @@ ONLY USE ON YOUR OWN NETWORK.
 
 import sys
 import os
-from datetime import datetime
 from collections import defaultdict
 import time
 

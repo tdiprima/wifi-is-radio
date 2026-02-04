@@ -96,15 +96,15 @@ def check_router_ports(gateway):
     # Generate findings
     for port, name, desc in open_ports:
         if port == 23:
-            findings.append(('HIGH', f'Telnet (port 23) open on router',
+            findings.append(('HIGH', 'Telnet (port 23) open on router',
                            'Telnet sends credentials in plain text',
                            'Disable Telnet and use SSH instead'))
         elif port == 21:
-            findings.append(('MEDIUM', f'FTP (port 21) open on router',
+            findings.append(('MEDIUM', 'FTP (port 21) open on router',
                            'FTP credentials and data are unencrypted',
                            'Disable FTP or switch to SFTP'))
         elif port == 80:
-            findings.append(('LOW', f'HTTP (port 80) open on router',
+            findings.append(('LOW', 'HTTP (port 80) open on router',
                            'Web admin interface may accept unencrypted logins',
                            'Ensure admin panel redirects to HTTPS'))
         elif port in [445, 3389]:
@@ -268,14 +268,14 @@ def generate_report(all_findings):
     print("📊 SECURITY AUDIT REPORT")
     print("=" * 70)
     print(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"Scope: Local network assessment")
+    print("Scope: Local network assessment")
     
     # Count by severity
     by_severity = {'HIGH': [], 'MEDIUM': [], 'LOW': [], 'INFO': []}
     for finding in all_findings:
         by_severity[finding[0]].append(finding)
     
-    print(f"\n📈 SUMMARY:")
+    print("\n📈 SUMMARY:")
     print(f"   🔴 High severity:   {len(by_severity['HIGH'])}")
     print(f"   🟡 Medium severity: {len(by_severity['MEDIUM'])}")
     print(f"   🟢 Low severity:    {len(by_severity['LOW'])}")
@@ -349,7 +349,7 @@ to help you understand what to look for in network security.
     gateway = get_gateway()
     local_ip = get_local_ip()
     
-    print(f"\n📍 Network Information:")
+    print("\n📍 Network Information:")
     print(f"   Your IP: {local_ip}")
     print(f"   Gateway: {gateway}")
     
